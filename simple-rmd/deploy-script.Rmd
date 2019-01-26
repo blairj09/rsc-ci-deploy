@@ -1,0 +1,77 @@
+---
+title: "Deploy Shiny"
+output: html_notebook
+---
+
+Following the guide outlined [here](https://docs.rstudio.com/connect/user/cookbook.html#cookbook-deploying).
+
+# Create Content
+This assumes that the environment variables `RSC_API_KEY` and `RSC_SERVER` are
+defined in an appropriate `.Renviron` file.
+
+```{bash}
+export DATA='{"name": "rsc-ci-rmd", "title": "RSC deployment of RMD document via CI"}'
+
+curl --silent --show-error -L --max-redirs 0 --fail -X POST \
+    -H "Authorization: Key ${RSC_API_KEY}" \
+    --data "${DATA}" \
+    "${RSC_SERVER}__api__/v1/experimental/content" > create-content-resp
+```
+
+# Generate manifest
+```{r}
+rsconnect::writeManifest(appFiles = c("simple-rmd.Rmd"))
+```
+
+# Create bundle
+```{bash}
+tar czf bundle.tar.gz manifest.json simple-rmd.Rmd
+```
+
+# Upload bundle
+Note - the use or the `-r` flag in `jq` is used so that a raw string is output,
+as opposed to a quoted string
+
+```{bash}
+CONTENT_GUID=$(cat create-content-resp | jq -r '.guid')
+echo $CONTENT_GUID
+
+curl --silent --show-error -L --max-redirs 0 --fail -X POST \
+    -H "Authorization: Key ${RSC_API_KEY}" \
+    --data-binary @"bundle.tar.gz" \
+    "${RSC_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/upload" > bundle-id
+```
+
+```{bash}
+cat bundle-id
+```
+
+
+# Deploy bundle
+
+```{bash}
+CONTENT_GUID=$(cat create-content-resp | jq -r '.guid')
+
+export BUNDLE_ID=$(cat bundle-id | jq '.bundle_id')
+echo $BUNDLE_ID
+
+export DATA='{"bundle_id":'${BUNDLE_ID}'}'
+echo $DATA
+
+curl --silent --show-error -L --max-redirs 0 --fail -X POST \
+    -H "Authorization: Key ${RSC_API_KEY}" \
+    --data "${DATA}" \
+    "${RSC_SERVER}__api__/v1/experimental/content/${CONTENT_GUID}/deploy" > task-id
+```
+
+# Query task
+
+```{bash}
+export TASK=$(cat task-id | jq -r '.task_id')
+echo $TASK
+
+curl --silent --show-error -L --max-redirs 1 \
+    -H "Authorization: Key ${RSC_API_KEY}" \
+    "${RSC_SERVER}__api__/v1/experimental/tasks/${TASK}?wait=1" | jq '.'
+```
+
