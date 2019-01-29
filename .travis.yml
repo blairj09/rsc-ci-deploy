@@ -1,7 +1,5 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
-sudo: false
-cache: packages
+language: r
 addons:
   apt:
     packages:
@@ -9,8 +7,5 @@ addons:
       - curl
 r_packages:
   - rsconnect
-deploy:
-  provider: script
-  script: bash simple-rmd/deploy.sh
-  on:
-    branch: master
+install: true
+script: ./simple-rmd/deploy.sh
