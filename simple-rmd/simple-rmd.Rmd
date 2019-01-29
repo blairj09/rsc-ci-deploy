@@ -1,7 +1,7 @@
 ---
 title: "Simple RMD"
 author: "James Blair"
-date: "1/25/2019"
+date: "`r Sys.time()`"
 output: html_document
 ---
 
