@@ -7,4 +7,5 @@ addons:
       - curl
 install:
   - Rscript -e "install.packages('rsconnect')"
-script: ./simple-rmd/deploy.sh
+before_script: cd simple-rmd
+script: ./deploy.sh
