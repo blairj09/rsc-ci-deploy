@@ -12,7 +12,7 @@
 set -ev
 
 # Generate the manifest
-Rscript -e "rsconnect::writeManifest(appFiles = 'simple-rmd.Rmd')"
+# Rscript -e "rsconnect::writeManifest(appFiles = 'simple-rmd.Rmd')"
 
 # Create the bundle
 tar czf bundle.tar.gz manifest.json simple-rmd.Rmd
