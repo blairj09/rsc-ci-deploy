@@ -1,11 +1,11 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 language: r
+r_packages:
+  - rsconnect
 addons:
   apt:
     packages:
       - jq
       - curl
-r_packages:
-  - rsconnect
 install: true
 script: ./simple-rmd/deploy.sh
