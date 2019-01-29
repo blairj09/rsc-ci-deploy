@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Script for automatically deploying content via Travis CI
 # This script assumes that the manifest and bundle have been created and 
 # commited to GH. It also assumes the following environment variables are set:
@@ -6,6 +8,8 @@
 # - CONTENT_GUID: GUID for the content being deployed to RSC
 
 # TODO: Should these be converted into bash functions?
+
+set -ev
 
 # Generate the manifest
 Rscript -e "rsconnect::writeManifest(appFiles = 'simple-rmd.Rmd')"
