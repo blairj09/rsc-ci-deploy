@@ -5,7 +5,6 @@ addons:
     packages:
       - jq
       - curl
-install:
-  - Rscript -e "install.packages('rsconnect')"
+install: true
 before_script: cd simple-rmd
 script: ./deploy.sh
